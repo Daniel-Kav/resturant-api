@@ -15,6 +15,13 @@
       "when": 1717419976071,
       "tag": "0001_elite_stark_industries",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1717421659396,
+      "tag": "0002_strange_captain_flint",
+      "breakpoints": true
     }
   ]
 }
