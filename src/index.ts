@@ -1,7 +1,8 @@
 import db from "./drizzle/db";
 import { eq,gt,like } from "drizzle-orm";
-import { ProfilesTable, UsersTable } from "./drizzle/schema";
+import { ProfilesTable, UsersTable , staterelations,StateTable} from "./drizzle/schema";
 import { TIUser, TSUser, TIProfile, TSProfile } from "./drizzle/schema";
+import { MenuItemTable, RestaurantTable, CategoryTable } from './drizzle/schema';
 
 //query
 const getUsers = async (): Promise<TSUser[] | null> => {
@@ -24,8 +25,10 @@ const createUserProfile = async (user: TIProfile) => {
     await db.insert(ProfilesTable).values({
         userId: user.userId,
         bio: user.bio
-    }).returning()
+    }).returning({userId: ProfilesTable.id});
+    console.log(user)
 }
+
 
 //insert
 const createUser = async (user: TIUser) => {
@@ -68,6 +71,20 @@ const searchUsers2 = async (param: string) => {
     return await db.select().from(UsersTable).where(like(UsersTable.fullname, `%${param}%`));  //  lt, lte, gt, gte, eq, neq, like, ilike, in, nin, between
 }
 
+async function getStateWithCity(stateId: number) {
+  const state = await db.query.stateTable.findFirst({
+    where: eq(StateTable.id, stateId),
+    with: stateRelations, // Include the relation
+  });
+
+  if (state) {
+    console.log(`State: ${state.name}`);
+    console.log(`  City: ${state.city.name}`); // Access city data through the relation
+  } else {
+    console.log(`State with ID ${stateId} not found.`);
+  }
+}
+
 
 
 async function main() {
@@ -76,6 +93,6 @@ async function main() {
     // console.log(await getProfiles());
     // await createUser({ address: "Lagos", fullname: "John Doe", phone: "08012345678", score: 100 })
     // console.log(await getUsers())
-    // console.log((await createUserProfile({ userId: 1, bio: "I am a developer" })))
+    console.log((await createUserProfile({ userId: 1, bio: "I am a developer" })))
 }
 main();
