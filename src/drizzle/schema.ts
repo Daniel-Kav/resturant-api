@@ -268,44 +268,44 @@ export const statusCatalogRelations = relations(StatusCatalogTable, ({ many }) =
     orders: many(OrderTable),
 }));
 
-// export type TICity = typeof CityTable.$inferInsert;
-// export type TSCity = typeof CityTable.$inferSelect;
+export type TICity = typeof CityTable.$inferInsert;
+export type TSCity = typeof CityTable.$inferSelect;
 
-// export type TIState = typeof StateTable.$inferInsert;
-// export type TSState = typeof StateTable.$inferSelect;
+export type TIState = typeof StateTable.$inferInsert;
+export type TSState = typeof StateTable.$inferSelect;
 
-// export type TIAddress = typeof AddressTable.$inferInsert;
-// export type TSAddress = typeof AddressTable.$inferSelect;
+export type TIAddress = typeof AddressTable.$inferInsert;
+export type TSAddress = typeof AddressTable.$inferSelect;
 
-// export type TIRestaurant = typeof RestaurantTable.$inferInsert;
-// export type TSRestaurant = typeof RestaurantTable.$inferSelect;
+export type TIRestaurant = typeof RestaurantTable.$inferInsert;
+export type TSRestaurant = typeof RestaurantTable.$inferSelect;
 
-// export type TIRestaurantOwner = typeof RestaurantOwnerTable.$inferInsert;
-// export type TSRestaurantOwner = typeof RestaurantOwnerTable.$inferSelect;
+export type TIRestaurantOwner = typeof RestaurantOwnerTable.$inferInsert;
+export type TSRestaurantOwner = typeof RestaurantOwnerTable.$inferSelect;
 
-// export type TIUser = typeof UserTable.$inferInsert;
-// export type TSUser = typeof UserTable.$inferSelect;
+export type TIUser = typeof UserTable.$inferInsert;
+export type TSUser = typeof UserTable.$inferSelect;
 
-// export type TICategory = typeof CategoryTable.$inferInsert;
-// export type TSCategory = typeof CategoryTable.$inferSelect;
+export type TICategory = typeof CategoryTable.$inferInsert;
+export type TSCategory = typeof CategoryTable.$inferSelect;
 
-// export type TIMenuItem = typeof MenuItemTable.$inferInsert;
-// export type TSMenuItem = typeof MenuItemTable.$inferSelect;
+export type TIMenuItem = typeof MenuItemTable.$inferInsert;
+export type TSMenuItem = typeof MenuItemTable.$inferSelect;
 
-// export type TIOrder = typeof OrderTable.$inferInsert;
-// export type TSOrder = typeof OrderTable.$inferSelect;
+export type TIOrder = typeof OrderTable.$inferInsert;
+export type TSOrder = typeof OrderTable.$inferSelect;
 
-// export type TIOrderMenuItem = typeof OrderMenuItemTable.$inferInsert;
-// export type TSOrderMenuItem = typeof OrderMenuItemTable.$inferSelect;
+export type TIOrderMenuItem = typeof OrderMenuItemTable.$inferInsert;
+export type TSOrderMenuItem = typeof OrderMenuItemTable.$inferSelect;
 
-// export type TICart = typeof CartTable.$inferInsert;
-// export type TSCart = typeof CartTable.$inferSelect;
+export type TICart = typeof CartTable.$inferInsert;
+export type TSCart = typeof CartTable.$inferSelect;
 
-// export type TIOrderStatus = typeof OrderStatusTable.$inferInsert;
-// export type TSOrderStatus = typeof OrderStatusTable.$inferSelect;
+export type TIOrderStatus = typeof OrderStatusTable.$inferInsert;
+export type TSOrderStatus = typeof OrderStatusTable.$inferSelect;
 
-// export type TIOrderDetails = typeof OrderDetailsTable.$inferInsert;
-// export type TSOrderDetails = typeof OrderDetailsTable.$inferSelect;
+export type TIOrderDetails = typeof OrderDetailsTable.$inferInsert;
+export type TSOrderDetails = typeof OrderDetailsTable.$inferSelect;
 
-// export type TIStatusCatalog = typeof StatusCatalogTable.$inferInsert;
-// export type TSStatusCatalog = typeof StatusCatalogTable.$inferSelect;
+export type TIStatusCatalog = typeof StatusCatalogTable.$inferInsert;
+export type TSStatusCatalog = typeof StatusCatalogTable.$inferSelect;
