@@ -1,311 +1,299 @@
-import { pgTable, serial, text, varchar, integer, decimal, boolean, timestamp, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, date, decimal, boolean, primaryKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-
-export const CityTable = pgTable('city', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
+// State table
+export const tableState = pgTable("state", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    code: text("code").notNull()
 });
 
-export const StateTable = pgTable('state', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  city_id: integer('city_id').references(() => CityTable.id).notNull(),
+// City table
+export const tableCity = pgTable("city", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    address: text("address").notNull(),
+    state_id: integer("state_id").notNull().references(() => tableState.id, { onDelete: "cascade" })
 });
 
-
-
-export const staterelations = relations(StateTable, ({ one }) => ({
-  city: one(CityTable, { fields: [StateTable.city_id], references: [CityTable.id] }),
-}));
-
-
-// Address Table
-export const AddressTable = pgTable('address', {
-    id: serial('id').primaryKey(),
-    street_address_1: varchar('street_address_1', { length: 255 }).notNull(),
-    street_address_2: varchar('street_address_2', { length: 255 }),
-    city_id: integer('city_id').references(() => CityTable.id).notNull(),
-    state_id: integer('state_id').references(() => StateTable.id).notNull(),
-    postal_code: varchar('postal_code', { length: 20 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Restaurant table
+export const tableRestaurant = pgTable("restaurant", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    street_address: text("street_address").notNull(),
+    zip_code: text("zip_code").notNull(),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    city_id: integer("city_id").notNull().references(() => tableCity.id, { onDelete: "cascade" })
 });
 
-// Restaurant Table
-export const RestaurantTable = pgTable('restaurant', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
-    address_id: integer('address_id').references(() => AddressTable.id).notNull(),
-    contact_phone: varchar('contact_phone', { length: 20 }).notNull(),
-    email: varchar('email', { length: 255 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Category table
+export const tableCategory = pgTable("category", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull()
 });
 
-// RestaurantOwner Table
-export const RestaurantOwnerTable = pgTable('restaurant_owner', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
-    restaurant_id: integer('restaurant_id').references(() => RestaurantTable.id).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Menu Item table
+export const tableMenuItem = pgTable("menu_item", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    ingredients: text("ingredients").notNull(),
+    price: decimal("price").notNull(),
+    active: boolean("active").notNull(),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    restaurant_id: integer("restaurant_id").notNull().references(() => tableRestaurant.id, { onDelete: "cascade" }),
+    category_id: integer("category_id").notNull().references(() => tableCategory.id, { onDelete: "cascade" })
 });
 
-// User Table
-export const UserTable = pgTable('user', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
-    email: varchar('email', { length: 255 }).notNull(),
-    contact_phone: varchar('contact_phone', { length: 20 }).notNull(),
-    password_hash: varchar('password_hash', { length: 255 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Status Catalog table
+export const tableStatusCatalog = pgTable("status_catalog", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull()
 });
 
-// Category Table
-export const CategoryTable = pgTable('category', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
+// Users table
+export const tableUsers = pgTable("users", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    contact_phone: text("contact_phone").notNull(),
+    phone_verified: boolean("phone_verified").notNull(),
+    email: text("email").notNull(),
+    email_verified: boolean("email_verified").notNull(),
+    confirmation_code: text("confirmation_code"),
+    password: text("password").notNull(),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull()
 });
 
-// MenuItem Table
-export const MenuItemTable = pgTable('menu_item', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
-    restaurant_id: integer('restaurant_id').references(() => RestaurantTable.id).notNull(),
-    category_id: integer('category_id').references(() => CategoryTable.id).notNull(),
-    description: text('description'),
-    ingredients: text('ingredients'),
-    price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-    active: boolean('active').default(true),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Driver table
+export const tableDriver = pgTable("driver", {
+    id: serial("id").primaryKey(),
+    car_make: text("car_make").notNull(),
+    car_model: text("car_model").notNull(),
+    car_year: integer("car_year").notNull(),
+    online: boolean("online").notNull(),
+    delivering: boolean("delivering").notNull(),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    user_id: integer("user_id").notNull().references(() => tableUsers.id, { onDelete: "cascade" })
 });
 
-// Order Table
-export const OrderTable = pgTable('order', {
-    id: serial('id').primaryKey(),
-    user_id: integer('user_id').references(() => UserTable.id).notNull(),
-    restaurant_id: integer('restaurant_id').references(() => RestaurantTable.id).notNull(),
-    cart_id: integer('cart_id').references(() => CartTable.id).notNull(),
-    status_id: integer('status_id').references(() => StatusCatalogTable.id).notNull(),
-    delivery_address_id: integer('delivery_address_id').references(() => AddressTable.id).notNull(),
-    total_price: decimal('total_price', { precision: 10, scale: 2 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Restaurant Owner table
+export const tableRestaurantOwner = pgTable("restaurant_owner", {
+    id: serial("id").primaryKey(),
+    owner_id: integer("owner_id").notNull().references(() => tableUsers.id, { onDelete: "cascade" }),
+    restaurant_id: integer("restaurant_id").notNull().references(() => tableRestaurant.id, { onDelete: "cascade" })
 });
 
-// OrderMenuItem Table
-export const OrderMenuItemTable = pgTable('order_menu_item', {
-    id: serial('id').primaryKey(),
-    order_id: integer('order_id').references(() => OrderTable.id).notNull(),
-    menu_item_id: integer('menu_item_id').references(() => MenuItemTable.id).notNull(),
-    quantity: integer('quantity').notNull(),
-    price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Address table
+export const tableAddress = pgTable("address", {
+    id: serial("id").primaryKey(),
+    street_address_1: text("street_address_1").notNull(),
+    street_address_2: text("street_address_2"),
+    description: text("description"),
+    zip_code: text("zip_code").notNull(),
+    delivery_instructions: text("delivery_instructions"),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    city_id: integer("city_id").notNull().references(() => tableCity.id, { onDelete: "cascade" }),
+    user_id: integer("user_id").notNull().references(() => tableUsers.id, { onDelete: "cascade" })
 });
 
-// Cart Table
-export const CartTable = pgTable('cart', {
-    id: serial('id').primaryKey(),
-    user_id: integer('user_id').references(() => UserTable.id).notNull(),
-    restaurant_id: integer('restaurant_id').references(() => RestaurantTable.id).notNull(),
-    total_price: decimal('total_price', { precision: 10, scale: 2 }).notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Orders table
+export const tableOrders = pgTable("orders", {
+    id: serial("id").primaryKey(),
+    estimated_delivery_time: date("estimated_delivery_time"),
+    actual_delivery_time: date("actual_delivery_time"),
+    price: decimal("price").notNull(),
+    discount: decimal("discount"),
+    final_price: decimal("final_price").notNull(),
+    comment: text("comment"),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    restaurant_id: integer("restaurant_id").notNull().references(() => tableRestaurant.id, { onDelete: "cascade" }),
+    delivery_address_id: integer("delivery_address_id").notNull().references(() => tableAddress.id, { onDelete: "cascade" }),
+    user_id: integer("user_id").notNull().references(() => tableUsers.id, { onDelete: "cascade" }),
+    driver_id: integer("driver_id").notNull().references(() => tableDriver.id, { onDelete: "cascade" })
 });
 
-// OrderStatus Table
-export const OrderStatusTable = pgTable('order_status', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
+// Order Status table
+export const tableOrderStatus = pgTable("order_status", {
+    id: serial("id").primaryKey(),
+    order_id: integer("order_id").notNull().references(() => tableOrders.id, { onDelete: "cascade" }),
+    status_catalog_id: integer("status_catalog_id").notNull().references(() => tableStatusCatalog.id, { onDelete: "cascade" })
 });
 
-// OrderDetails Table
-export const OrderDetailsTable = pgTable('order_details', {
-    id: serial('id').primaryKey(),
-    order_id: integer('order_id').references(() => OrderTable.id).notNull(),
-    status_id: integer('status_id').references(() => OrderStatusTable.id).notNull(),
-    updated_at: timestamp('updated_at').defaultNow(),
+// Comment table
+export const tableComment = pgTable("comment", {
+    id: serial("id").primaryKey(),
+    comment_text: text("comment_text").notNull(),
+    is_complaint: boolean("is_complaint").notNull(),
+    is_praise: boolean("is_praise").notNull(),
+    created_at: date("created_at").notNull(),
+    updated_at: date("updated_at").notNull(),
+    order_id: integer("order_id").notNull().references(() => tableOrders.id, { onDelete: "cascade" }),
+    user_id: integer("user_id").notNull().references(() => tableUsers.id, { onDelete: "cascade" })
 });
 
-// StatusCatalog Table
-export const StatusCatalogTable = pgTable('status_catalog', {
-    id: serial('id').primaryKey(),
-    name: varchar('name', { length: 255 }).notNull(),
+// Order Menu Item table
+export const tableOrderMenuItem = pgTable("order_menu_item", {
+    id: serial("id").primaryKey(),
+    quantity: integer("quantity").notNull(),
+    item_price: decimal("item_price").notNull(),
+    price: decimal("price").notNull(),
+    comment: text("comment"),
+    order_id: integer("order_id").notNull().references(() => tableOrders.id, { onDelete: "cascade" }),
+    menu_item_id: integer("menu_item_id").notNull().references(() => tableMenuItem.id, { onDelete: "cascade" })
 });
 
 // Relationships
-export const cityRelations = relations(CityTable, ({ many }) => ({
-    states: many(StateTable),
-    addresses: many(AddressTable),
+// State - City (1-* relationship)
+export const stateCityRelation = relations(tableState, ({ one, many }) => ({
+    cities: many(tableCity)
 }));
 
-export const stateRelations = relations(StateTable, ({ many, one }) => ({
-    city: one(CityTable, {
-        fields: [StateTable.city_id],
-        references: [CityTable.id],
-    }),
-    addresses: many(AddressTable),
-}));
+// // City - Restaurant (1-* relationship)
+// export const cityRestaurantRelation = relations(tableCity, ({ one, many }) => ({
+//     restaurants: many(tableRestaurant, {
+//         fields: [tableRestaurant.city_id],
+//         references: [tableCity.id]
+//     })
+// }));
 
-export const addressRelations = relations(AddressTable, ({ many, one }) => ({
-    city: one(CityTable, {
-        fields: [AddressTable.city_id],
-        references: [CityTable.id],
-    }),
-    state: one(StateTable, {
-        fields: [AddressTable.state_id],
-        references: [StateTable.id],
-    }),
-    restaurants: many(RestaurantTable),
-    orders: many(OrderTable),
-}));
+// // City - Address (1-* relationship)
+// export const cityAddressRelation = relations(tableCity, ({ one, many }) => ({
+//     addresses: many(tableAddress, {
+//         fields: [tableAddress.city_id],
+//         references: [tableCity.id]
+//     })
+// }));
 
-export const restaurantRelations = relations(RestaurantTable, ({ one, many }) => ({
-    address: one(AddressTable, {
-        fields: [RestaurantTable.address_id],
-        references: [AddressTable.id],
-    }),
-    owner: one(RestaurantOwnerTable),
-    menuItems: many(MenuItemTable),
-    orders: many(OrderTable),
-    carts: many(CartTable),
-}));
+// // Restaurant - Menu Item (1-* relationship)
+// export const restaurantMenuItemRelation = relations(tableRestaurant, ({ one, many }) => ({
+//     menu_items: many(tableMenuItem, {
+//         fields: [tableMenuItem.restaurant_id],
+//         references: [tableRestaurant.id]
+//     })
+// }));
 
-export const restaurantOwnerRelations = relations(RestaurantOwnerTable, ({ one }) => ({
-    restaurant: one(RestaurantTable, {
-        fields: [RestaurantOwnerTable.restaurant_id],
-        references: [RestaurantTable.id],
-    }),
-}));
+// // Restaurant - Orders (1-* relationship)
+// export const restaurantOrdersRelation = relations(tableRestaurant, ({ one, many }) => ({
+//     orders: many(tableOrders, {
+//         fields: [tableOrders.restaurant_id],
+//         references: [tableRestaurant.id]
+//     })
+// }));
 
-export const userRelations = relations(UserTable, ({ many }) => ({
-    orders: many(OrderTable),
-    carts: many(CartTable),
-}));
+// // Restaurant - Restaurant Owner (1-* relationship)
+// export const restaurantOwnerRelation = relations(tableRestaurant, ({ one, many }) => ({
+//     restaurant_owners: many(tableRestaurantOwner, {
+//         fields: [tableRestaurantOwner.restaurant_id],
+//         references: [tableRestaurant.id]
+//     })
+// }));
 
-export const categoryRelations = relations(CategoryTable, ({ many }) => ({
-    menuItems: many(MenuItemTable),
-}));
+// // Menu Item - Order Menu Item (1-* relationship)
+// export const menuItemOrderMenuItemRelation = relations(tableMenuItem, ({ one, many }) => ({
+//     order_menu_items: many(tableOrderMenuItem, {
+//         fields: [tableOrderMenuItem.menu_item_id],
+//         references: [tableMenuItem.id]
+//     })
+// }));
 
-export const menuItemRelations = relations(MenuItemTable, ({ one, many }) => ({
-    restaurant: one(RestaurantTable, {
-        fields: [MenuItemTable.restaurant_id],
-        references: [RestaurantTable.id],
-    }),
-    category: one(CategoryTable, {
-        fields: [MenuItemTable.category_id],
-        references: [CategoryTable.id],
-    }),
-    orderMenuItems: many(OrderMenuItemTable),
-}));
+// // Category - Menu Item (1-* relationship)
+// export const categoryMenuItemRelation = relations(tableCategory, ({ one, many }) => ({
+//     menu_items: many(tableMenuItem, {
+//         fields: [tableMenuItem.category_id],
+//         references: [tableCategory.id]
+//     })
+// }));
 
-export const orderRelations = relations(OrderTable, ({ one, many }) => ({
-    user: one(UserTable, {
-        fields: [OrderTable.user_id],
-        references: [UserTable.id],
-    }),
-    restaurant: one(RestaurantTable, {
-        fields: [OrderTable.restaurant_id],
-        references: [RestaurantTable.id],
-    }),
-    cart: one(CartTable, {
-        fields: [OrderTable.cart_id],
-        references: [CartTable.id],
-    }),
-    deliveryAddress: one(AddressTable, {
-        fields: [OrderTable.delivery_address_id],
-        references: [AddressTable.id],
-    }),
-    status: one(StatusCatalogTable, {
-        fields: [OrderTable.status_id],
-        references: [StatusCatalogTable.id],
-    }),
-    orderMenuItems: many(OrderMenuItemTable),
-}));
+// // Address - Orders (1-* relationship)
+// export const addressOrdersRelation = relations(tableAddress, ({ one, many }) => ({
+//     orders: many(tableOrders, {
+//         fields: [tableOrders.delivery_address_id],
+//         references: [tableAddress.id]
+//     })
+// }));
 
-export const orderMenuItemRelations = relations(OrderMenuItemTable, ({ one }) => ({
-    order: one(OrderTable, {
-        fields: [OrderMenuItemTable.order_id],
-        references: [OrderTable.id],
-    }),
-    menuItem: one(MenuItemTable, {
-        fields: [OrderMenuItemTable.menu_item_id],
-        references: [MenuItemTable.id],
-    }),
-}));
+// // Users - Address (1-* relationship)
+// export const usersAddressRelation = relations(tableUsers, ({ one, many }) => ({
+//     addresses: many(tableAddress, {
+//         fields: [tableAddress.user_id],
+//         references: [tableUsers.id]
+//     })
+// }));
 
-export const cartRelations = relations(CartTable, ({ one }) => ({
-    user: one(UserTable, {
-        fields: [CartTable.user_id],
-        references: [UserTable.id],
-    }),
-    restaurant: one(RestaurantTable, {
-        fields: [CartTable.restaurant_id],
-        references: [RestaurantTable.id],
-    }),
-}));
+// // Users - Restaurant Owner (1-* relationship)
+// export const usersRestaurantOwnerRelation = relations(tableUsers, ({ one, many }) => ({
+//     restaurant_owners: many(tableRestaurantOwner, {
+//         fields: [tableRestaurantOwner.owner_id],
+//         references: [tableUsers.id]
+//     })
+// }));
 
-export const orderStatusRelations = relations(OrderStatusTable, ({ many }) => ({
-    orderDetails: many(OrderDetailsTable),
-}));
+// // Users - Driver (1-* relationship)
+// export const usersDriverRelation = relations(tableUsers, ({ one, many }) => ({
+//     drivers: many(tableDriver, {
+//         fields: [tableDriver.user_id],
+//         references: [tableUsers.id]
+//     })
+// }));
 
-export const orderDetailsRelations = relations(OrderDetailsTable, ({ one }) => ({
-    order: one(OrderTable, {
-        fields: [OrderDetailsTable.order_id],
-        references: [OrderTable.id],
-    }),
-    status: one(OrderStatusTable, {
-        fields: [OrderDetailsTable.status_id],
-        references: [OrderStatusTable.id],
-    }),
-}));
+// // Users - Orders (1-* relationship)
+// export const usersOrdersRelation = relations(tableUsers, ({ one, many }) => ({
+//     orders: many(tableOrders, {
+//         fields: [tableOrders.user_id],
+//         references: [tableUsers.id]
+//     })
+// }));
 
-export const statusCatalogRelations = relations(StatusCatalogTable, ({ many }) => ({
-    orders: many(OrderTable),
-}));
+// // Users - Comments (1-* relationship)
+// export const usersCommentsRelation = relations(tableUsers, ({ one, many }) => ({
+//     comments: many(tableComment, {
+//         fields: [tableComment.user_id],
+//         references: [tableUsers.id]
+//     })
+// }));
 
-export type TICity = typeof CityTable.$inferInsert;
-export type TSCity = typeof CityTable.$inferSelect;
+// // Driver - Orders (1-* relationship)
+// export const driverOrdersRelation = relations(tableDriver, ({ one, many }) => ({
+//     orders: many(tableOrders, {
+//         fields: [tableOrders.driver_id],
+//         references: [tableDriver.id]
+//     })
+// }));
 
-export type TIState = typeof StateTable.$inferInsert;
-export type TSState = typeof StateTable.$inferSelect;
+// // Orders - Comments (1-* relationship)
+// export const ordersCommentsRelation = relations(tableOrders, ({ one, many }) => ({
+//     comments: many(tableComment, {
+//         fields: [tableComment.order_id],
+//         references: [tableOrders.id]
+//     })
+// }));
 
-export type TIAddress = typeof AddressTable.$inferInsert;
-export type TSAddress = typeof AddressTable.$inferSelect;
+// // Orders - Order Status (1-* relationship)
+// export const ordersOrderStatusRelation = relations(tableOrders, ({ one, many }) => ({
+//     order_statuses: many(tableOrderStatus, {
+//         fields: [tableOrderStatus.order_id],
+//         references: [tableOrders.id]
+//     })
+// }));
 
-export type TIRestaurant = typeof RestaurantTable.$inferInsert;
-export type TSRestaurant = typeof RestaurantTable.$inferSelect;
+// // Orders - Order Menu Item (1-* relationship)
+// export const ordersOrderMenuItemRelation = relations(tableOrders, ({ one, many }) => ({
+//     order_menu_items: many(tableOrderMenuItem, {
+//         fields: [tableOrderMenuItem.order_id],
+//         references: [tableOrders.id]
+//     })
+// }));
 
-export type TIRestaurantOwner = typeof RestaurantOwnerTable.$inferInsert;
-export type TSRestaurantOwner = typeof RestaurantOwnerTable.$inferSelect;
-
-export type TIUser = typeof UserTable.$inferInsert;
-export type TSUser = typeof UserTable.$inferSelect;
-
-export type TICategory = typeof CategoryTable.$inferInsert;
-export type TSCategory = typeof CategoryTable.$inferSelect;
-
-export type TIMenuItem = typeof MenuItemTable.$inferInsert;
-export type TSMenuItem = typeof MenuItemTable.$inferSelect;
-
-export type TIOrder = typeof OrderTable.$inferInsert;
-export type TSOrder = typeof OrderTable.$inferSelect;
-
-export type TIOrderMenuItem = typeof OrderMenuItemTable.$inferInsert;
-export type TSOrderMenuItem = typeof OrderMenuItemTable.$inferSelect;
-
-export type TICart = typeof CartTable.$inferInsert;
-export type TSCart = typeof CartTable.$inferSelect;
-
-export type TIOrderStatus = typeof OrderStatusTable.$inferInsert;
-export type TSOrderStatus = typeof OrderStatusTable.$inferSelect;
-
-export type TIOrderDetails = typeof OrderDetailsTable.$inferInsert;
-export type TSOrderDetails = typeof OrderDetailsTable.$inferSelect;
-
-export type TIStatusCatalog = typeof StatusCatalogTable.$inferInsert;
-export type TSStatusCatalog = typeof StatusCatalogTable.$inferSelect;
+// // Status Catalog - Order Status (1-* relationship)
+// export const statusCatalogOrderStatusRelation = relations(tableStatusCatalog, ({ one, many }) => ({
+//     order_statuses: many(tableOrderStatus, {
+//         fields: [tableOrderStatus.status_catalog_id],
+//         references: [tableStatusCatalog.id]
+//     })
+// }));

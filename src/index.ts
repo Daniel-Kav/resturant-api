@@ -1,17 +1,39 @@
 import db from "./drizzle/db";
 import { eq,gt,like } from "drizzle-orm";
-import {  StateTable,CityTable} from "./drizzle/schema";
-import { cityRelations,stateRelations } from "./drizzle/schema";
-import { MenuItemTable, RestaurantTable, CategoryTable , OrderDetailsTable} from './drizzle/schema';
+import {
+    stateCityRelation,cityRestaurantRelation,cityAddressRelation,restaurantMenuItemRelation,restaurantOrdersRelation,restaurantOwnerRelation,
+    menuItemOrderMenuItemRelation,categoryMenuItemRelation,addressOrdersRelation,usersAddressRelation,usersRestaurantOwnerRelation,usersDriverRelation,usersOrdersRelation,
+    usersCommentsRelation,
+    driverOrdersRelation,
+    ordersCommentsRelation,
+    ordersOrderStatusRelation,
+    ordersOrderMenuItemRelation,
+    statusCatalogOrderStatusRelation
+} from "./drizzle/schema";
+
+import {
+    tableState,
+    tableCity,
+    tableRestaurant,
+    tableCategory,
+    tableMenuItem,
+    tableStatusCatalog,
+    tableUsers,
+    tableDriver,
+    tableRestaurantOwner,
+    tableAddress,
+    tableOrders,
+    tableOrderStatus,
+    tableComment,
+    tableOrderMenuItem
+} from "./drizzle/schema";
+
 
 const getUsersWithPostsAndProfiles = async () => {
-    return await db.query.OrderDetailsTable.findMany({
-        with: { order : true
-            }
-        
-    })
+    return await db.query.tableComment.findFirst()
 }
- 
+
+
 
 
 async function main() {
@@ -22,5 +44,6 @@ async function main() {
     // console.log(await getUsers())
     // console.log((await createUserProfile({ userId: 1, bio: "I am a developer" })))
     console.log(await getUsersWithPostsAndProfiles())
+    // console.log( await insertData())
 }
 main();
