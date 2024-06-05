@@ -1,49 +1,48 @@
 import db from "./drizzle/db";
 import { eq,gt,like } from "drizzle-orm";
-import {
-    stateCityRelation,cityRestaurantRelation,cityAddressRelation,restaurantMenuItemRelation,restaurantOrdersRelation,restaurantOwnerRelation,
-    menuItemOrderMenuItemRelation,categoryMenuItemRelation,addressOrdersRelation,usersAddressRelation,usersRestaurantOwnerRelation,usersDriverRelation,usersOrdersRelation,
-    usersCommentsRelation,
-    driverOrdersRelation,
-    ordersCommentsRelation,
-    ordersOrderStatusRelation,
-    ordersOrderMenuItemRelation,
-    statusCatalogOrderStatusRelation
-} from "./drizzle/schema";
-
-import {
-    tableState,
-    tableCity,
-    tableRestaurant,
-    tableCategory,
-    tableMenuItem,
-    tableStatusCatalog,
-    tableUsers,
-    tableDriver,
-    tableRestaurantOwner,
-    tableAddress,
-    tableOrders,
-    tableOrderStatus,
-    tableComment,
-    tableOrderMenuItem
-} from "./drizzle/schema";
+import {category, city, menuItem, order, restaurant, user} from "./drizzle/schema";
+import { equal } from "assert";
 
 
-const getUsersWithPostsAndProfiles = async () => {
+
+const getCitieswithStates = async () => {
+    return await db.query.city.findMany({
+        columns: {
+            stateId:true,
+            name: true
+        },
+        with: {
+            state:{
+                columns: {
+                    name: true
+                }
+            }
+        }
+    })
+}
+
+const getRestuarantById = async (restaurantId: number) => {
+    return db.query.restaurant.findFirst({
+        where: eq(restaurant.id, restaurantId),
+      with: {
+        menuItems: {
+          with: {
+            category:{
+                columns:{
+                    name: true,
+                }
+            }
+          },
+        },
+      },
+    })
 }
 
 
 
 
 async function main() {
-    // console.log(await updateUserProfile("I am a senior developer", 1))
-    // await deleteUserProfile(3)
-    // console.log(await getProfiles());
-    // await createUser({ address: "Lagos", fullname: "John Doe", phone: "08012345678", score: 100 })
-    // console.log(await getUsers())
-    // console.log((await createUserProfile({ userId: 1, bio: "I am a developer" })))
-    // console.log(await getUsersWithPostsAndProfiles())
-    // console.log( await insertData())
-    // console.log( await getUserWithProfile())
+    console.log(await getCitieswithStates() )
+    console.log(await getRestuarantById(5))
 }
 main();
