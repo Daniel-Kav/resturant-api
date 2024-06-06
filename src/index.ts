@@ -1,48 +1,53 @@
-import db from "./drizzle/db";
-import { eq,gt,like } from "drizzle-orm";
-import {category, city, menuItem, order, restaurant, user} from "./drizzle/schema";
-import { equal } from "assert";
+import { serve } from '@hono/node-server'
+import { Hono } from 'hono'
+import "dotenv/config"
+import { logger } from 'hono/logger'
+import { csrf } from 'hono/csrf'
+import { trimTrailingSlash } from 'hono/trailing-slash'
+import { timeout } from 'hono/timeout'
+import { HTTPException } from 'hono/http-exception'
+// import { prometheus } from '@hono/prometheus'
+
+import { userRouter } from './users/user.router'
+import { profileRouter } from './profile/profile.router'
+
+
+const app = new Hono().basePath('/api')
+
+const customTimeoutException = () =>
+  new HTTPException(408, {
+    message: `Request timeout after waiting for more than 10 seconds`,
+  })
+
+const { printMetrics, registerMetrics } = prometheus()
+
+// inbuilt middlewares
+app.use(logger())  //logs request and response to the console
+app.use(csrf()) //prevents CSRF attacks by checking request headers.
+app.use(trimTrailingSlash()) //removes trailing slashes from the request URL
+app.use('/', timeout(10000, customTimeoutException))
+//3rd party middlewares
+app.use('*', registerMetrics)
+
+
+// default route
+app.get('/ok', (c) => {
+  return c.text('The server is running📢😏😏😏!')
+})
+app.get('/timeout', async (c) => {
+  await new Promise((resolve) => setTimeout(resolve, 11000))
+  return c.text("data after 5 seconds", 200)
+})
+app.get('/metrics', printMetrics)
+
+// custom route
+app.route("/", userRouter)   // /users
+app.route("/", profileRouter) // /profile
 
 
 
-const getCitieswithStates = async () => {
-    return await db.query.city.findMany({
-        columns: {
-            stateId:true,
-            name: true
-        },
-        with: {
-            state:{
-                columns: {
-                    name: true
-                }
-            }
-        }
-    })
-}
-
-const getRestuarantById = async (restaurantId: number) => {
-    return db.query.restaurant.findFirst({
-        where: eq(restaurant.id, restaurantId),
-      with: {
-        menuItems: {
-          with: {
-            category:{
-                columns:{
-                    name: true,
-                }
-            }
-          },
-        },
-      },
-    })
-}
-
-
-
-
-async function main() {
-    console.log(await getCitieswithStates() )
-    console.log(await getRestuarantById(5))
-}
-main();
+serve({
+  fetch: app.fetch,
+  port: Number(process.env.PORT)
+})
+console.log(`Server is running on port ${process.env.PORT}`)
